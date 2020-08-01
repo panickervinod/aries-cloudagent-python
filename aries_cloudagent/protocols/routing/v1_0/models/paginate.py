@@ -2,7 +2,7 @@
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.models.base import BaseModel, BaseModelSchema
+from .....messaging.models.base import BaseModel, BaseModelSchema
 
 
 class Paginate(BaseModel):
@@ -22,7 +22,7 @@ class Paginate(BaseModel):
             offset: Set the offset of the first requested result
 
         """
-        super(Paginate, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.limit = limit
         self.offset = offset
 

@@ -4,7 +4,7 @@ from typing import Sequence
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from .....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from ..message_types import MENU, PROTOCOL_PACKAGE
 from ..models.menu_option import MenuOption, MenuOptionSchema
@@ -40,7 +40,7 @@ class Menu(AgentMessage):
             errormsg: An optional error message to display
             options: A sequence of menu options
         """
-        super(Menu, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.title = title
         self.description = description
         self.options = list(options) if options else []

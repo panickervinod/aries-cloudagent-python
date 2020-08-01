@@ -59,6 +59,21 @@ class TestHolderRoutes(AsyncTestCase):
         with self.assertRaises(test_module.web.HTTPNotFound):
             await test_module.credentials_get(request)
 
+    async def test_attribute_mime_types_get(self):
+        request = async_mock.MagicMock(
+            app=self.app, match_info={"credential_id": "dummy"}
+        )
+
+        request.app["request_context"].inject = async_mock.CoroutineMock(
+            return_value=async_mock.MagicMock(
+                get_mime_type=async_mock.CoroutineMock(return_value=None)
+            )
+        )
+
+        with async_mock.patch.object(test_module.web, "json_response") as mock_response:
+            await test_module.credentials_attr_mime_types_get(request)
+            mock_response.assert_called_once_with(None)
+
     async def test_credentials_remove(self):
         request = async_mock.MagicMock(
             app=self.app, match_info={"credential_id": "dummy"}
@@ -133,3 +148,8 @@ class TestHolderRoutes(AsyncTestCase):
 
         await test_module.register(mock_app)
         mock_app.add_routes.assert_called_once()
+
+    async def test_post_process_routes(self):
+        mock_app = async_mock.MagicMock(_state={"swagger_dict": {}})
+        test_module.post_process_routes(mock_app)
+        assert "tags" in mock_app._state["swagger_dict"]

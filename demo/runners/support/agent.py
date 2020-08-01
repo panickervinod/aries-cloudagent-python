@@ -36,7 +36,7 @@ TRACE_TARGET = os.getenv("TRACE_TARGET")
 TRACE_TAG = os.getenv("TRACE_TAG")
 TRACE_ENABLED = os.getenv("TRACE_ENABLED")
 
-ADMIN_ENDPOINT = os.getenv("ADMIN_ENDPOINT")
+AGENT_ENDPOINT = os.getenv("AGENT_ENDPOINT")
 
 DEFAULT_POSTGRES = bool(os.getenv("POSTGRES"))
 DEFAULT_INTERNAL_HOST = "127.0.0.1"
@@ -111,9 +111,11 @@ class DemoAgent:
         label: str = None,
         color: str = None,
         prefix: str = None,
+        tails_server_base_url: str = None,
         timing: bool = False,
         timing_log: str = None,
         postgres: bool = None,
+        revocation: bool = False,
         extra_args=None,
         **params,
     ):
@@ -129,14 +131,15 @@ class DemoAgent:
         self.timing = timing
         self.timing_log = timing_log
         self.postgres = DEFAULT_POSTGRES if postgres is None else postgres
+        self.tails_server_base_url = tails_server_base_url
         self.extra_args = extra_args
         self.trace_enabled = TRACE_ENABLED
         self.trace_target = TRACE_TARGET
         self.trace_tag = TRACE_TAG
 
         self.admin_url = f"http://{self.internal_host}:{admin_port}"
-        if ADMIN_ENDPOINT:
-            self.endpoint = ADMIN_ENDPOINT
+        if AGENT_ENDPOINT:
+            self.endpoint = AGENT_ENDPOINT
         elif RUN_MODE == "pwd":
             self.endpoint = f"http://{self.external_host}".replace(
                 "{PORT}", str(http_port)
@@ -174,7 +177,12 @@ class DemoAgent:
         self.wallet_stats = []
 
     async def register_schema_and_creddef(
-        self, schema_name, version, schema_attrs, support_revocation: bool = False
+        self,
+        schema_name,
+        version,
+        schema_attrs,
+        support_revocation: bool = False,
+        revocation_registry_size: int = None,
     ):
         # Create a schema
         schema_body = {
@@ -191,6 +199,7 @@ class DemoAgent:
         credential_definition_body = {
             "schema_id": schema_id,
             "support_revocation": support_revocation,
+            "revocation_registry_size": revocation_registry_size,
         }
         credential_definition_response = await self.admin_POST(
             "/credential-definitions", credential_definition_body
@@ -224,8 +233,10 @@ class DemoAgent:
         log_msg(f"Revocation Registry ID: {revocation_registry_id}")
         assert tails_hash == my_tails_hash
 
-        tails_file_url = f"{self.public_tails_url}/revocation/registry/{revocation_registry_id}/tails-file"
-
+        tails_file_url = (
+            f"{self.public_tails_url}/revocation/registry/"
+            f"{revocation_registry_id}/tails-file"
+        )
         if os.getenv("PUBLIC_TAILS_URL"):
             tails_file_url = f"{self.public_tails_url}/{revocation_registry_id}"
             tails_file_external_url = (
@@ -308,6 +319,9 @@ class DemoAgent:
                     ("--trace-label", self.label + ".trace"),
                 ]
             )
+
+        if self.tails_server_base_url:
+            result.append(("--tails-server-base-url", self.tails_server_base_url))
         else:
             # set the tracing parameters but don't enable tracing
             result.extend(
@@ -475,6 +489,16 @@ class DemoAgent:
                     f"to handle webhook on topic {topic}"
                 )
 
+    async def handle_problem_report(self, message):
+        self.log(
+            f"Received problem report: {message['explain-ltxt']}\n", source="stderr"
+        )
+
+    async def handle_revocation_registry(self, message):
+        self.log(
+            f"Revocation registry: {message['record_id']} state: {message['state']}"
+        )
+
     async def admin_request(
         self, method, path, data=None, text=False, params=None
     ) -> ClientResponse:
@@ -482,8 +506,12 @@ class DemoAgent:
         async with self.client_session.request(
             method, self.admin_url + path, json=data, params=params
         ) as resp:
-            resp.raise_for_status()
             resp_text = await resp.text()
+            try:
+                resp.raise_for_status()
+            except Exception as e:
+                # try to retrieve and print text on error
+                raise Exception(f"Error: {resp_text}") from e
             if not resp_text and not text:
                 return None
             if not text:

@@ -4,7 +4,7 @@ from typing import Mapping, Sequence
 
 from marshmallow import fields, Schema, validate
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from .....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from ..message_types import DISCLOSE, PROTOCOL_PACKAGE
 
@@ -28,7 +28,7 @@ class Disclose(AgentMessage):
         Args:
             protocols: A mapping of protocol names to a dictionary of properties
         """
-        super(Disclose, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.protocols = list(protocols) if protocols else []
 
 

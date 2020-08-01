@@ -4,7 +4,7 @@ from typing import Mapping, Sequence
 
 from marshmallow import fields, validate
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from ....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from .message_types import PROBLEM_REPORT, PROTOCOL_PACKAGE
 
@@ -55,7 +55,7 @@ class ProblemReport(AgentMessage):
             tracking_uri: URI for tracking the problem
             escalation_uri: URI for escalating the problem
         """
-        super(ProblemReport, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.msg_catalog = msg_catalog
         self.locale = locale
         self.explain_ltxt = explain_ltxt

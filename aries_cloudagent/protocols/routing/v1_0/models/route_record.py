@@ -2,7 +2,7 @@
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.models.base import BaseModel, BaseModelSchema
+from .....messaging.models.base import BaseModel, BaseModelSchema
 
 
 class RouteRecord(BaseModel):
@@ -30,7 +30,7 @@ class RouteRecord(BaseModel):
             recipient_key: The recipient verkey of the route
 
         """
-        super(RouteRecord, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.record_id = record_id
         self.connection_id = connection_id
         self.recipient_key = recipient_key

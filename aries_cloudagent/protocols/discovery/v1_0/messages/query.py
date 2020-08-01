@@ -2,7 +2,7 @@
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from .....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from ..message_types import QUERY, PROTOCOL_PACKAGE
 
@@ -30,7 +30,7 @@ class Query(AgentMessage):
             query: The query string to match against supported message types
             comment: An optional comment
         """
-        super(Query, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.query = query
         self.comment = comment
 

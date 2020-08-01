@@ -2,7 +2,7 @@
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from .....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from ..message_types import CONNECTION_REQUEST, PROTOCOL_PACKAGE
 from ..models.connection_detail import ConnectionDetail, ConnectionDetailSchema
@@ -39,7 +39,7 @@ class ConnectionRequest(AgentMessage):
             label: Label for this connection request
             image_url: Optional image URL for this connection request
         """
-        super(ConnectionRequest, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.connection = connection
         self.label = label
 

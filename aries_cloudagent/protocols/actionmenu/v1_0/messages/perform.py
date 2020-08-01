@@ -4,7 +4,7 @@ from typing import Mapping
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from .....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from ..message_types import PERFORM, PROTOCOL_PACKAGE
 
@@ -29,7 +29,7 @@ class Perform(AgentMessage):
             name: The name of the menu option
             params: Input parameter values
         """
-        super(Perform, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.name = name
         self.params = params
 

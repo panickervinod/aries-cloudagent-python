@@ -2,7 +2,7 @@
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.models.base import BaseModel, BaseModelSchema
+from .....messaging.models.base import BaseModel, BaseModelSchema
 
 
 class Paginated(BaseModel):
@@ -32,7 +32,7 @@ class Paginated(BaseModel):
             total: Total number of records available
 
         """
-        super(Paginated, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.start = start
         self.end = end
         self.limit = limit

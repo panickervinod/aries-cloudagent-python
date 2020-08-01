@@ -2,7 +2,7 @@
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from .....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from ..message_types import INVITATION_REQUEST, PROTOCOL_PACKAGE
 
@@ -29,7 +29,7 @@ class InvitationRequest(AgentMessage):
             responder: The name of the agent initiating the introduction
             message: Comments on the introduction
         """
-        super(InvitationRequest, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.responder = responder
         self.message = message
 

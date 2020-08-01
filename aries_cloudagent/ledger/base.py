@@ -25,6 +25,11 @@ class BaseLedger(ABC, metaclass=ABCMeta):
     async def __aexit__(self, exc_type, exc, tb):
         """Context manager exit."""
 
+    @property
+    @abstractmethod
+    def type(self) -> str:
+        """Accessor for the ledger type."""
+
     @abstractmethod
     async def get_key_for_did(self, did: str) -> str:
         """Fetch the verkey for a ledger DID.
@@ -67,6 +72,15 @@ class BaseLedger(ABC, metaclass=ABCMeta):
     @abstractmethod
     def nym_to_did(self, nym: str) -> str:
         """Format a nym with the ledger's DID prefix."""
+
+    @abstractmethod
+    async def rotate_public_did_keypair(self, next_seed: str = None) -> None:
+        """
+        Rotate keypair for public DID: create new key, submit to ledger, update wallet.
+
+        Args:
+            next_seed: seed for incoming ed25519 keypair (default random)
+        """
 
     def did_to_nym(self, did: str) -> str:
         """Remove the ledger's DID prefix to produce a nym."""

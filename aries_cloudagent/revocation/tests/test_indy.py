@@ -49,7 +49,6 @@ class TestIndyRevocation(AsyncTestCase):
 
         assert result.cred_def_id == CRED_DEF_ID
         assert result.issuer_did == self.test_did
-        assert result.issuance_type == IssuerRevRegRecord.ISSUANCE_BY_DEFAULT
         assert result.max_cred_num == DEFAULT_REGISTRY_SIZE
         assert result.revoc_def_type == IssuerRevRegRecord.REVOC_DEF_TYPE_CL
         assert result.tag is None
@@ -155,3 +154,10 @@ class TestIndyRevocation(AsyncTestCase):
         ) as mock_from_def:
             result = await self.revoc.get_ledger_registry("dummy")
             assert result == mock_from_def.return_value
+            assert "dummy" in IndyRevocation.REV_REG_CACHE
+
+            await self.revoc.get_ledger_registry("dummy")
+
+        mock_from_def.assert_called_once_with(
+            self.ledger.get_revoc_reg_def.return_value, True
+        )

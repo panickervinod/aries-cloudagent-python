@@ -4,7 +4,7 @@ from typing import Sequence
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from .....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from ..message_types import PROTOCOL_PACKAGE, ROUTE_UPDATE_RESPONSE
 from ..models.route_updated import RouteUpdated, RouteUpdatedSchema
@@ -33,7 +33,7 @@ class RouteUpdateResponse(AgentMessage):
             updated: A list of route updates
         """
 
-        super(RouteUpdateResponse, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.updated = updated or []
 
 

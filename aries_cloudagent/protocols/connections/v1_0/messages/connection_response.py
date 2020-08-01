@@ -2,7 +2,7 @@
 
 from marshmallow import fields
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from .....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from ..message_types import CONNECTION_RESPONSE, PROTOCOL_PACKAGE
 from ..models.connection_detail import ConnectionDetail, ConnectionDetailSchema
@@ -31,7 +31,7 @@ class ConnectionResponse(AgentMessage):
             connection: Connection details object
 
         """
-        super(ConnectionResponse, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.connection = connection
 
 

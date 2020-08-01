@@ -5,10 +5,11 @@ from aiohttp_apispec import docs, match_info_schema, request_schema
 
 from marshmallow import fields, Schema
 
-from aries_cloudagent.connections.models.connection_record import ConnectionRecord
-from aries_cloudagent.messaging.valid import UUIDFour
-from aries_cloudagent.storage.error import StorageNotFoundError
+from ....connections.models.connection_record import ConnectionRecord
+from ....messaging.valid import UUIDFour
+from ....storage.error import StorageNotFoundError
 
+from .message_types import SPEC_URI
 from .messages.basicmessage import BasicMessage
 
 
@@ -44,8 +45,8 @@ async def connections_send_message(request: web.BaseRequest):
 
     try:
         connection = await ConnectionRecord.retrieve_by_id(context, connection_id)
-    except StorageNotFoundError:
-        raise web.HTTPNotFound()
+    except StorageNotFoundError as err:
+        raise web.HTTPNotFound(reason=err.roll_up) from err
 
     if connection.is_ready:
         msg = BasicMessage(content=params["content"])
@@ -59,4 +60,19 @@ async def register(app: web.Application):
 
     app.add_routes(
         [web.post("/connections/{conn_id}/send-message", connections_send_message)]
+    )
+
+
+def post_process_routes(app: web.Application):
+    """Amend swagger API."""
+
+    # Add top-level tags description
+    if "tags" not in app._state["swagger_dict"]:
+        app._state["swagger_dict"]["tags"] = []
+    app._state["swagger_dict"]["tags"].append(
+        {
+            "name": "basicmessage",
+            "description": "Simple messaging",
+            "externalDocs": {"description": "Specification", "url": SPEC_URI},
+        }
     )

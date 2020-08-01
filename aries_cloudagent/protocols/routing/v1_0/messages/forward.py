@@ -6,7 +6,7 @@ from typing import Union
 
 from marshmallow import fields, pre_load
 
-from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from .....messaging.agent_message import AgentMessage, AgentMessageSchema
 
 from ..message_types import FORWARD, PROTOCOL_PACKAGE
 
@@ -31,7 +31,7 @@ class Forward(AgentMessage):
             to (str): Recipient DID
             msg (str): Message content
         """
-        super(Forward, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.to = to
         if isinstance(msg, str):
             msg = json.loads(msg)
